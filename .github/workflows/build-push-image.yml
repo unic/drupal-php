@@ -2,9 +2,11 @@ name: Build and publish Docker image
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - 'release/*'
+#  pull_request:
+#    branches: [ "main" ]
 
 jobs:
 
@@ -34,5 +36,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ if startsWith(github.ref, 'refs/tags/') }}
+              unic/drupal-php:${{ github.ref.replace('refs/tags/', '') }}
+            {{ else if startsWith(github.ref, 'refs/heads/main') }}
+              unic/drupal-php:latest
+            {{ else if startsWith(github.ref, 'refs/heads/release/') }}
+              unic/drupal-php:${{ github.ref.replace('refs/heads/release/', '') }}-latest
+            {{ endif }}
           labels: ${{ steps.meta.outputs.labels }}
