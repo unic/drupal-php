@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-buster
+FROM php:8.1-fpm-bullseye
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -34,7 +34,7 @@ RUN set -eux; \
 		zip \
 	; \
 	\
-	pecl install redis-5.1.1; \
+	pecl install redis-5.3.7; \
 	docker-php-ext-enable redis; \
 	\
 	pecl install apcu; \
@@ -99,7 +99,7 @@ RUN { \
 RUN sed -i  s'/access.log = \/proc\/self\/fd\/2/access.log = \/proc\/self\/fd\/1/' /usr/local/etc/php-fpm.d/docker.conf
 
 # Install drush launcher to use the drush version of the project.
-ARG DRUSH_LAUNCHER_VERSION=0.6.0
+ARG DRUSH_LAUNCHER_VERSION=0.10.1
 
 # Install drush launcher with the phar file.
 RUN curl -fsSL -o /usr/local/bin/drush "https://github.com/drush-ops/drush-launcher/releases/download/$DRUSH_LAUNCHER_VERSION/drush.phar" && \
@@ -109,6 +109,5 @@ RUN curl -fsSL -o /usr/local/bin/drush "https://github.com/drush-ops/drush-launc
 ENV PATH="/var/www/html/web/vendor/bin:${PATH}"
 
 # Install Composer
-COPY --from=composer:2.3.10 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.4.4 /usr/bin/composer /usr/bin/composer
 RUN composer --version
-
