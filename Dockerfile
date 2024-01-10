@@ -106,7 +106,7 @@ RUN curl -fsSL -o /usr/local/bin/drush "https://github.com/drush-ops/drush-launc
   chmod +x /usr/local/bin/drush
 
 # Set the path variable to use drush directly from this project.
-ENV PATH="/var/www/html/web/vendor/bin:${PATH}"
+ENV PATH="/var/www/html/vendor/bin:${PATH}"
 
 # Install Composer
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
