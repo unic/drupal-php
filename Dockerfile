@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-bullseye
+FROM php:8.3-fpm-bullseye
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -110,5 +110,5 @@ RUN curl -fsSL -o /usr/local/bin/drush "https://github.com/drush-ops/drush-launc
 ENV PATH="/var/www/html/vendor/bin:${PATH}"
 
 # Install Composer
-COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8.9 /usr/bin/composer /usr/bin/composer
 RUN composer --version
