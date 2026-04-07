@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-bullseye
+FROM php:8.4-fpm-bookworm
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -13,11 +13,7 @@ RUN set -eux; \
 		libwebp-dev \
 		libpq-dev \
 		libzip-dev \
-		jpegoptim \
-		optipng \
 		pngcrush \
-		pngquant \
-		libjpeg-progs \
 	; \
 	\
 	docker-php-ext-configure gd \
@@ -35,11 +31,11 @@ RUN set -eux; \
 		bcmath \
 	; \
 	\
-	pecl install redis-5.3.7; \
+	pecl install redis-6.3.0; \
 	docker-php-ext-enable redis; \
 	\
-	pecl install apcu; \
-        docker-php-ext-enable apcu; \
+	pecl install apcu-5.1.28; \
+	docker-php-ext-enable apcu; \
 	\
 	pecl clear-cache \
 	\
