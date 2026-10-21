@@ -53,7 +53,6 @@ The following defaults are applied on top of the standard PHP-FPM configuration:
 | `upload_max_filesize` | 20M |
 | `post_max_size` | 20M |
 | `memory_limit` | 256M |
-| `session.upload_progress.enabled` | Off |
 | `opcache.memory_consumption` | 128 |
 | `opcache.interned_strings_buffer` | 16 |
 | `opcache.max_accelerated_files` | 20000 |
