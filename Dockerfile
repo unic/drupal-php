@@ -86,7 +86,6 @@ RUN { \
 		echo 'upload_max_filesize = 20M'; \
 		echo 'post_max_size = 20M'; \
 		echo 'memory_limit = 256M'; \
-		echo 'session.upload_progress.enabled = Off'; \
 	} > /usr/local/etc/php/conf.d/custom-settings.ini
 
 # Write the php-fpm access.log to stdout instead of stderr
