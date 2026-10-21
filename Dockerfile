@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-buster
+FROM php:8.4-fpm-bookworm
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -13,11 +13,6 @@ RUN set -eux; \
 		libwebp-dev \
 		libpq-dev \
 		libzip-dev \
-		jpegoptim \
-		optipng \
-		pngcrush \
-		pngquant \
-		libjpeg-progs \
 	; \
 	\
 	docker-php-ext-configure gd \
@@ -32,23 +27,24 @@ RUN set -eux; \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
+		bcmath \
 	; \
 	\
-	pecl install redis-5.1.1; \
+	pecl install redis-6.3.0; \
 	docker-php-ext-enable redis; \
 	\
-	pecl install apcu; \
-        docker-php-ext-enable apcu; \
+	pecl install apcu-5.1.28; \
+	docker-php-ext-enable apcu; \
 	\
-	pecl clear-cache \
+	pecl clear-cache; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); printf "*%s\n", so }' \
 		| sort -u \
-		| xargs -r dpkg-query -S \
+		| xargs -r dpkg-query --search \
 		| cut -d: -f1 \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
@@ -58,7 +54,6 @@ RUN set -eux; \
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       sudo \
        rsync \
        mariadb-client \
        unzip \
@@ -69,9 +64,8 @@ RUN apt-get update \
        optipng \
        jpegoptim \
        gifsicle \
+       pngcrush \
        libjpeg-turbo-progs \
-    && echo "www-data:www-data" | chpasswd \
-    && adduser www-data sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Use the default production configuration
@@ -82,10 +76,9 @@ RUN apt-get update \
 # see https://secure.php.net/manual/en/opcache.installation.php
 RUN { \
 		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
+		echo 'opcache.interned_strings_buffer=16'; \
+		echo 'opcache.max_accelerated_files=20000'; \
 		echo 'opcache.revalidate_freq=60'; \
-		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # Override default settings, to get it running with Drupal smoothly.
@@ -95,20 +88,19 @@ RUN { \
 		echo 'memory_limit = 256M'; \
 	} > /usr/local/etc/php/conf.d/custom-settings.ini
 
-# Disable access.log on php-fpm level in docker logs
+# Write the php-fpm access.log to stdout instead of stderr
 RUN sed -i  s'/access.log = \/proc\/self\/fd\/2/access.log = \/proc\/self\/fd\/1/' /usr/local/etc/php-fpm.d/docker.conf
 
 # Install drush launcher to use the drush version of the project.
-ARG DRUSH_LAUNCHER_VERSION=0.6.0
+ARG DRUSH_LAUNCHER_VERSION=0.10.1
 
 # Install drush launcher with the phar file.
 RUN curl -fsSL -o /usr/local/bin/drush "https://github.com/drush-ops/drush-launcher/releases/download/$DRUSH_LAUNCHER_VERSION/drush.phar" && \
   chmod +x /usr/local/bin/drush
 
 # Set the path variable to use drush directly from this project.
-ENV PATH="/var/www/html/web/vendor/bin:${PATH}"
+ENV PATH="/var/www/html/vendor/bin:${PATH}"
 
 # Install Composer
-COPY --from=composer:2.3.10 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.10.3 /usr/bin/composer /usr/bin/composer
 RUN composer --version
-
