@@ -54,8 +54,8 @@ The following defaults are applied on top of the standard PHP-FPM configuration:
 | `post_max_size` | 20M |
 | `memory_limit` | 256M |
 | `opcache.memory_consumption` | 128 |
-| `opcache.interned_strings_buffer` | 8 |
-| `opcache.max_accelerated_files` | 4000 |
+| `opcache.interned_strings_buffer` | 16 |
+| `opcache.max_accelerated_files` | 20000 |
 | `opcache.revalidate_freq` | 60 |
 
 ## Usage
