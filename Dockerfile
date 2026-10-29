@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-bookworm
+FROM php:8.4-fpm-trixie
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -7,7 +7,7 @@ RUN set -eux; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libfreetype6-dev \
+		libfreetype-dev \
 		libjpeg-dev \
 		libpng-dev \
 		libwebp-dev \
