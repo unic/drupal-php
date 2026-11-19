@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-trixie
+FROM php:8.4.28-fpm-trixie
 
 # install the PHP extensions we need
 RUN set -eux; \
